@@ -52,7 +52,7 @@ def brute_decrypt_sb_xor(bs):
     res = []
     for i in range(256):
         pt = decrypt_sb_xor(bs, i)
-        res.append((decrypt_score(pt), pt))
+        res.append((decrypt_score(pt), pt, i))
     return max(res), res
 
 def find_data_dir():
@@ -66,3 +66,13 @@ def find_data_dir():
 
 def datafile(filename):
     return os.path.join(find_data_dir(), filename)
+
+def brute_decrypt_msb_xor(ciphers):
+    cipherlen = len(ciphers[0])
+    word = []
+    for i in range(len(ciphers)):
+        word.append(ciphers[i])
+    word = bytes(word)
+    (score, pt, i), _ = brute_decrypt_sb_xor(word)
+    for cipher in ciphers:
+        print(decrypt_sb_xor(cipher))

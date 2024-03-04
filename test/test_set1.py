@@ -14,7 +14,7 @@ def test_chal2():
 
 def test_chal3():
     bs = cryptolib.unhexlify(b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
-    (score, best), _ = cryptolib.brute_decrypt_sb_xor(bs)
+    (score, best, c), _ = cryptolib.brute_decrypt_sb_xor(bs)
     assert best==b"Cooking MC's like a pound of bacon"
 
 def test_chal4():
