@@ -1,6 +1,7 @@
 import base64
 import binascii
 import string
+import os
 
 # chal 1
 def unhexlify(bs):
@@ -53,3 +54,15 @@ def brute_decrypt_sb_xor(bs):
         pt = decrypt_sb_xor(bs, i)
         res.append((decrypt_score(pt), pt))
     return max(res), res
+
+def find_data_dir():
+    import os
+    curdir = os.getcwd()
+    while curdir != "/": # bug if data is in root dir
+        curtest = os.path.join(curdir, "data")
+        if os.path.exists(curtest):
+            return curtest
+        curtest = os.path.realpath(os.path.join(curtest,".."))
+
+def datafile(filename):
+    return os.path.join(find_data_dir(), filename)
