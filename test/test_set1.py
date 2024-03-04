@@ -18,7 +18,14 @@ def test_chal3():
     assert best==b"Cooking MC's like a pound of bacon"
 
 def test_chal4():
+    lines = []
     with open(cryptolib.datafile("4.txt"), "rb") as afile:
         for line in afile.readlines():
-            line = line.strip()
-    assert False
+            lines.append(cryptolib.unhexlify(line.strip()))
+    
+    pts = []
+    for cipher in lines:
+        (score, pt, c), _ = cryptolib.brute_decrypt_sb_xor(cipher)
+        pts.append((score, pt))
+    best = max(pts)[1]
+    assert b"Now that the party is jumping\n" == best

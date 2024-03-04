@@ -26,13 +26,13 @@ def hexlify(bs):
     return bytes(res)
 
 #chal 2
-def strxor(bs1, bs2):
+def strxor(bs1 : bytes, bs2 : bytes):
     res = []
     for (a,b) in zip(bs1,bs2):
         res.append(a^b)
     return bytes(res)
 
-def decrypt_score(bs):
+def decrypt_score(bs : bytes):
     printable = string.printable.encode()
     score = 0
     for b in bs:
@@ -42,13 +42,13 @@ def decrypt_score(bs):
             score += 2
     return score
 
-def decrypt_sb_xor(bs, s):
+def decrypt_sb_xor(bs : bytes, s : bytes):
     res = []
     for b in bs:
         res.append(b^s)
     return bytes(res)
 
-def brute_decrypt_sb_xor(bs):
+def brute_decrypt_sb_xor(bs : bytes):
     res = []
     for i in range(256):
         pt = decrypt_sb_xor(bs, i)
@@ -64,15 +64,5 @@ def find_data_dir():
             return curtest
         curtest = os.path.realpath(os.path.join(curtest,".."))
 
-def datafile(filename):
+def datafile(filename : str):
     return os.path.join(find_data_dir(), filename)
-
-def brute_decrypt_msb_xor(ciphers):
-    cipherlen = len(ciphers[0])
-    word = []
-    for i in range(len(ciphers)):
-        word.append(ciphers[i])
-    word = bytes(word)
-    (score, pt, i), _ = brute_decrypt_sb_xor(word)
-    for cipher in ciphers:
-        print(decrypt_sb_xor(cipher))
