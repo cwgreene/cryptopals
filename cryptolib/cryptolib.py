@@ -42,7 +42,7 @@ def decrypt_score(bs : bytes):
             score += 2
     return score
 
-def decrypt_sb_xor(bs : bytes, s : bytes):
+def decrypt_sb_xor(bs : bytes, s : int):
     res = []
     for b in bs:
         res.append(b^s)
