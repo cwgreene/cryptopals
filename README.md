@@ -7,3 +7,7 @@ Setup (python):
 - `. activate.src`
 - `pip3 install requirements.txt`
 - `pytest`
+
+Setup (vscode)
+- Run `Create Environment` from the action menu. Select `Venv`
+- Run `Configure Tests`. Select `pytest`
