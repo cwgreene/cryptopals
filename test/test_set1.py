@@ -1,6 +1,8 @@
 import cryptolib
 import base64
 
+from Crypto.Cipher import AES
+
 def test_chal1():
     assert (base64.b64encode(
         cryptolib.unhexlify(b"49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"))
@@ -45,3 +47,11 @@ def test_chal6():
     assert score > 0
     assert key == b"Terminator X: Bring the noise"
     assert solution == expected
+
+def test_chal7():
+    data = cryptolib.datafile("7.txt")
+    data = base64.b64decode(open(data).read())
+    expected = open(cryptolib.datafile("7_sol.txt"), "rb").read()
+    aes = AES.new(key=b"YELLOW SUBMARINE", mode=AES.MODE_ECB)
+    sln = aes.decrypt(data)
+    assert expected == sln
