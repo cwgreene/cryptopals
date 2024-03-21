@@ -29,3 +29,19 @@ def test_chal4():
         pts.append((score, pt))
     best = max(pts)[1]
     assert b"Now that the party is jumping\n" == best
+
+def test_chal5():
+    plaintext = b"Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
+    key = b"ICE"
+    solution = (b"0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
+               b"a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")
+    assert cryptolib.hexlify(cryptolib.encrypt_xor_repeat(plaintext, key))==solution
+
+def test_chal6():
+    data = cryptolib.datafile("6.txt")
+    data = base64.b64decode(open(data).read())
+    expected = open(cryptolib.datafile("6_sol.txt"), "rb").read()
+    score, solution, key = cryptolib.brute_decrypt_rep_xor(data)
+    assert score > 0
+    assert key == b"Terminator X: Bring the noise"
+    assert solution == expected

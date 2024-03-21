@@ -8,6 +8,9 @@ Setup (python):
 - `pip3 install requirements.txt`
 - `pytest`
 
+Note if pytest fails, try running `rehash` to ensure that zsh
+hasn't cached the path.
+
 Setup (vscode)
 - Run `Create Environment` from the action menu. Select `Venv`
 - Run `Configure Tests`. Select `pytest`
