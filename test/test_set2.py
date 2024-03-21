@@ -1,5 +1,5 @@
 import cryptolib
-from cryptolib import strxor, aes_decrypt_ecb, gen_blocks
+from cryptolib import strxor, aes_decrypt_ecb, gen_blocks, aes_decrypt_cbc
 import base64
 
 def test_gen_blocks():
@@ -21,11 +21,7 @@ def test_chal2():
     data = base64.b64decode(open(dpath).read())
     dpath = cryptolib.datafile("10_sol.txt")
     solution = open(dpath, "rb").read()
-    xor = b"\x00"*16
-    plaintext = b""
+    IV = b"\x00"*16
     key = b"YELLOW SUBMARINE"
-    for block in gen_blocks(data):
-        decrypt = aes_decrypt_ecb(block, key)
-        plaintext += strxor(xor, decrypt)
-        xor = block
+    plaintext = aes_decrypt_cbc(data, key, IV)
     assert solution == plaintext

@@ -6,34 +6,7 @@ import math
 
 from Crypto.Cipher import AES
 
-# chal 1
-def unhexlify(bs):
-    index = b"0123456789abcdef"
-    res = []
-    if len(bs) % 2 != 0:
-        raise Exception("Odd number of input bytes to unhexlify")
-    for i in range(len(bs)//2):
-        c1 = bs[2*i]  
-        c2 = bs[2*i+1]
-        if c1 not in index or c2 not in index:
-            raise Exception(f"Cannot decode '{chr(c)}'")
-        res.append(16*index.index(c1) + index.index(c2))
-    return bytes(res)
-
-def hexlify(bs):
-    index = b"0123456789abcdef"
-    res = []
-    for b in bs:
-        res.append(index[b>>4])
-        res.append(index[b%16])
-    return bytes(res)
-
-#chal 2
-def strxor(bs1 : bytes, bs2 : bytes):
-    res = []
-    for (a,b) in zip(bs1,bs2):
-        res.append(a^b)
-    return bytes(res)
+from .byte_manipulation import strxor
 
 def decrypt_score(bs : bytes):
     printable = string.printable.encode()
@@ -99,30 +72,7 @@ def encrypt_xor_repeat(pt, xor):
 def decrypt_xor_repeat(ct, xor):
     return encrypt_xor_repeat(ct, xor)
 
-def detect_aes_ecb(ct : bytes, blocksize : int = 16):
-    blocks = set()
-    for i in range(len(ct)//blocksize):
-        block = ct[i*blocksize:(i+1)*blocksize]
-        if block in blocks:
-            return True
-        blocks.add(block)
-    return False
-
 def pad_pkcs7(bs, length):
     diff = length - len(bs)
     return bs + bytes([diff])*diff
 
-def aes_encrypt_ecb(bs, key):
-    aes = AES.new(key, mode=AES.MODE_ECB)
-    return aes.encrypt(bs)
-
-def aes_decrypt_ecb(bs, key):
-    aes = AES.new(key, mode=AES.MODE_ECB)
-    return aes.decrypt(bs)
-
-def aes_decrypt_cbc(bs, key, IV):
-    pass
-
-def gen_blocks(bs, blocklength : int = 16):
-    for i in range(len(bs)//blocklength):
-        yield bs[i*blocklength:(i+1)*blocklength]
