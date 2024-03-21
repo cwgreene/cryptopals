@@ -18,6 +18,17 @@ def aes_decrypt_cbc(bs, key, IV):
         xor = block
     return plaintext
 
+def aes_encrypt_cbc(bs, key, IV):
+    xor = IV
+    ciphertext = b""
+    assert len(IV) % 16 == 0
+    for block in gen_blocks(bs):
+        encrypt = aes_encrypt_ecb(strxor(block, xor), key)
+        ciphertext += encrypt
+        xor = encrypt
+    return ciphertext
+
+
 def detect_aes_ecb(ct : bytes, blocksize : int = 16):
     blocks = set()
     for i in range(len(ct)//blocksize):
