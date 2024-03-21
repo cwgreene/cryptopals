@@ -4,6 +4,8 @@ import string
 import os
 import math
 
+from Crypto.Cipher import AES
+
 # chal 1
 def unhexlify(bs):
     index = b"0123456789abcdef"
@@ -105,3 +107,22 @@ def detect_aes_ecb(ct : bytes, blocksize : int = 16):
             return True
         blocks.add(block)
     return False
+
+def pad_pkcs7(bs, length):
+    diff = length - len(bs)
+    return bs + bytes([diff])*diff
+
+def aes_encrypt_ecb(bs, key):
+    aes = AES.new(key, mode=AES.MODE_ECB)
+    return aes.encrypt(bs)
+
+def aes_decrypt_ecb(bs, key):
+    aes = AES.new(key, mode=AES.MODE_ECB)
+    return aes.decrypt(bs)
+
+def aes_decrypt_cbc(bs, key, IV):
+    pass
+
+def gen_blocks(bs, blocklength : int = 16):
+    for i in range(len(bs)//blocklength):
+        yield bs[i*blocklength:(i+1)*blocklength]

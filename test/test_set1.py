@@ -52,8 +52,7 @@ def test_chal7():
     data = cryptolib.datafile("7.txt")
     data = base64.b64decode(open(data).read())
     expected = open(cryptolib.datafile("7_sol.txt"), "rb").read()
-    aes = AES.new(key=b"YELLOW SUBMARINE", mode=AES.MODE_ECB)
-    sln = aes.decrypt(data)
+    sln = cryptolib.aes_decrypt_ecb(data, b"YELLOW SUBMARINE")
     assert expected == sln
 
 def test_chal8():
