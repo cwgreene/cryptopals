@@ -96,3 +96,12 @@ def encrypt_xor_repeat(pt, xor):
 
 def decrypt_xor_repeat(ct, xor):
     return encrypt_xor_repeat(ct, xor)
+
+def detect_aes_ecb(ct : bytes, blocksize : int = 16):
+    blocks = set()
+    for i in range(len(ct)//blocksize):
+        block = ct[i*blocksize:(i+1)*blocksize]
+        if block in blocks:
+            return True
+        blocks.add(block)
+    return False

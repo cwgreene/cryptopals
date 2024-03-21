@@ -55,3 +55,13 @@ def test_chal7():
     aes = AES.new(key=b"YELLOW SUBMARINE", mode=AES.MODE_ECB)
     sln = aes.decrypt(data)
     assert expected == sln
+
+def test_chal8():
+    dpath = cryptolib.datafile("8.txt")
+    data = open(dpath, "rb").read()
+    data = [base64.b64decode(d) for d in data.split(b"\n")]
+    count = 0
+    for line in data:
+        if cryptolib.detect_aes_ecb(line):
+            count += 1
+    assert count == 1
