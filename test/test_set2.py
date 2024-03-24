@@ -36,3 +36,5 @@ def test_chal2_decrypt_file():
     plaintext = aes_decrypt_cbc(data, key, IV)
 
     assert solution == plaintext
+
+def test_chal3:

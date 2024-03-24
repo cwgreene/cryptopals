@@ -37,3 +37,11 @@ def detect_aes_ecb(ct : bytes, blocksize : int = 16):
             return True
         blocks.add(block)
     return False
+
+class EncryptionOracle:
+    def __init__(self, key):
+        self.key = key
+    def encrypt(self, data):
+        cbc = lambda data, key: aes_encrypt_cbc(data, key, IV=os.urandom(16))
+        which = random.choice([aes_encrypt_ecb, cbc])
+        return which(data, self.key)
