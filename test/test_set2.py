@@ -37,4 +37,5 @@ def test_chal2_decrypt_file():
 
     assert solution == plaintext
 
-def test_chal3:
+def test_chal3():
+    pass

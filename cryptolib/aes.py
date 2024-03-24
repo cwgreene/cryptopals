@@ -1,5 +1,8 @@
 from Crypto.Cipher import AES
+import random
+
 from .byte_manipulation import gen_blocks, strxor
+from . import pad_pkcs7 as pad
 
 def aes_encrypt_ecb(bs, key):
     aes = AES.new(key, mode=AES.MODE_ECB)
@@ -42,6 +45,9 @@ class EncryptionOracle:
     def __init__(self, key):
         self.key = key
     def encrypt(self, data):
+        prefix = os.urandom(random.randint(5,10))
+        suffix = os.urandom(random.randint(5,10))
         cbc = lambda data, key: aes_encrypt_cbc(data, key, IV=os.urandom(16))
+        data = pad(prefix + data + suffix)
         which = random.choice([aes_encrypt_ecb, cbc])
         return which(data, self.key)
