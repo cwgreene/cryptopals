@@ -73,6 +73,6 @@ def decrypt_xor_repeat(ct, xor):
     return encrypt_xor_repeat(ct, xor)
 
 def pad_pkcs7(bs, length):
-    diff = length - len(bs)
+    diff = (length - len(bs)) % length
     return bs + bytes([diff])*diff
 

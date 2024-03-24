@@ -1,5 +1,5 @@
 import cryptolib
-from cryptolib import strxor, aes_decrypt_ecb, gen_blocks, aes_decrypt_cbc, aes_encrypt_cbc
+from cryptolib import strxor, aes_decrypt_ecb, gen_blocks, aes_decrypt_cbc, aes_encrypt_cbc, EncryptionOracle, oracle_detect_ecb
 import base64
 import os
 
@@ -38,4 +38,11 @@ def test_chal2_decrypt_file():
     assert solution == plaintext
 
 def test_chal3():
-    pass
+    for i in range(100):
+        oracle = EncryptionOracle(os.urandom(16))
+        for i in range(100):
+            res = oracle_detect_ecb(oracle)
+            if res:
+                assert oracle.record[-1] == oracle.ecb
+            else:
+                assert oracle.record[-1] == oracle.cbc
