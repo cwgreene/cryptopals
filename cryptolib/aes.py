@@ -67,6 +67,7 @@ class EncryptionOracle:
 
 def oracle_detect_ecb(oracle : EncryptionOracle):
     result = oracle.encrypt(b"A"*32+b"A"*11)
-    if result[-3*16:-2*16] == result[-2*16:-16]:
+    blocks = list(gen_blocks(result))
+    if blocks[-2] == blocks[-3]:
         return True
     return False
