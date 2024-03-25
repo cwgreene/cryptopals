@@ -73,6 +73,12 @@ def test_chal4():
         pull_buf = (len(buf) + secret_length - (i+1))*b"a"
         print(len(pull_buf))
         print(known_secret)
+        # Layout is
+        # - Bunch of A's with guess
+        # - Bunch of A's with pulled value
+        # - Suffix
+        # Always compare the last block of the first bunch of a's
+        # with the last block of the second bunch of as
         for guess_char in range(256):
             guess_char = bytes([guess_char])
             first_blocks = pull_buf + known_secret + guess_char
@@ -87,4 +93,5 @@ def test_chal4():
             if result_blocks[index] == result_blocks[index2]:
                 known_secret += guess_char
                 break
-    assert known_secret == secret
+    assert known_secret == secret#
+
