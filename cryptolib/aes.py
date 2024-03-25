@@ -43,6 +43,10 @@ def detect_aes_ecb(ct : bytes, blocksize : int = 16):
     return False
 
 class EncryptionOracle:
+    def encrypt(self, data):
+        raise NotImplementedError("This is an interface stub class.")
+
+class SwitchingEncryptionOracle(EncryptionOracle):
     def __init__(self,
             key,
             prefix_len_range = (5,10),
@@ -64,6 +68,13 @@ class EncryptionOracle:
         which = random.choice([self.cbc, self.ecb])
         self.record.append(which)
         return which(data, self.key)
+    
+class SuffixECBEncryptionOracle(EncryptionOracle):
+    def __init__(self, suffix):
+        self.key = os.urandom(16)
+        self.suffix = suffix
+    def encrypt(self, data):
+        return aes_decrypt_ecb(pad(data + self.suffix,16), self.key)
 
 def oracle_detect_ecb(oracle : EncryptionOracle):
     result = oracle.encrypt(b"A"*32+b"A"*11)

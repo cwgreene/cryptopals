@@ -1,5 +1,13 @@
 import cryptolib
-from cryptolib import strxor, aes_decrypt_ecb, gen_blocks, aes_decrypt_cbc, aes_encrypt_cbc, EncryptionOracle, oracle_detect_ecb
+from cryptolib import (strxor,
+    aes_decrypt_ecb,
+    gen_blocks,
+    aes_decrypt_cbc,
+    aes_encrypt_cbc,
+    SwitchingEncryptionOracle,
+    oracle_detect_ecb,
+    SuffixECBEncryptionOracle,
+    pad_pkcs7)
 import base64
 import os
 
@@ -39,10 +47,32 @@ def test_chal2_decrypt_file():
 
 def test_chal3():
     for i in range(100):
-        oracle = EncryptionOracle(os.urandom(16))
+        oracle = SwitchingEncryptionOracle(os.urandom(16))
         for i in range(100):
             res = oracle_detect_ecb(oracle)
             if res:
                 assert oracle.record[-1] == oracle.ecb
             else:
                 assert oracle.record[-1] == oracle.cbc
+
+def test_chal4():
+    secret = base64.b64decode(open(cryptolib.datafile("12.txt")).read())
+    oracle = SuffixECBEncryptionOracle(secret)
+    res = oracle.encrypt(b"")
+
+    # determine length of secret and associated
+    # buffer string
+    padded_length = len(res)
+    buf = b""
+    while padded_length == len(oracle.encrypt(buf)):
+        buf += b"a"
+    buf = buf[:-1]
+    secret_length = padded_length - len(buf)
+    known_secret = b""
+    for i in range(secret_length):
+        pull_buf = (len(buf) + secret_length - i)*b"a"
+        test_block = (len(buf) + secret_length)//16
+        for guess_char in range(256):
+            first_block = "a"*((i-1) % 16)
+            test = first_block + push_buf + known_secret
+            result = oracle.encrypt(test)
