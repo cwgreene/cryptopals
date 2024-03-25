@@ -70,9 +70,21 @@ def test_chal4():
     secret_length = padded_length - len(buf)
     known_secret = b""
     for i in range(secret_length):
-        pull_buf = (len(buf) + secret_length - i)*b"a"
-        test_block = (len(buf) + secret_length)//16
+        pull_buf = (len(buf) + secret_length - (i+1))*b"a"
+        print(len(pull_buf))
+        print(known_secret)
         for guess_char in range(256):
-            first_block = "a"*((i-1) % 16)
-            test = first_block + push_buf + known_secret
+            guess_char = bytes([guess_char])
+            first_blocks = pull_buf + known_secret + guess_char
+            print(len(first_blocks))
+            #print(len(first_blocks))
+            # layout
+            index = len(first_blocks)//16 - 1
+            index2 = 2*len(first_blocks)//16 - 1
+            test = first_blocks + pull_buf
             result = oracle.encrypt(test)
+            result_blocks = list(gen_blocks(result))
+            if result_blocks[index] == result_blocks[index2]:
+                known_secret += guess_char
+                break
+    assert known_secret == secret
