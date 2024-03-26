@@ -76,6 +76,13 @@ class SuffixECBEncryptionOracle(EncryptionOracle):
     def encrypt(self, data):
         return aes_decrypt_ecb(pad(data + self.suffix,16), self.key)
 
+class SuffixECBEncryptionOracleWithRandomPrefix(SuffixECBEncryptionOracle):
+    def __init__(self, suffix):
+        SuffixECBEncryptionOracle.__init__(self, suffix)
+    def encrypt(self, data):
+        noise = os.urandom(random.randint(256))
+        return aes_decrypt_ecb(pad(noise + data + self.suffix, 16), self.key)
+
 def oracle_detect_ecb(oracle : EncryptionOracle):
     result = oracle.encrypt(b"A"*32+b"A"*11)
     blocks = list(gen_blocks(result))
