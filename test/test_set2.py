@@ -96,33 +96,61 @@ def test_chal14():
     oracle = SuffixECBEncryptionOracleWithRandomPrefix(secret)
     res = oracle.encrypt(b"")
 
+    def find_signature(blocks):
+        i = 0
+        while blocks[i] != blocks[i+1]:
+            i += 1
+            if i + 3 >= len(blocks):
+                return None
+        # The A block should be different than the B block.
+        if blocks[i+2] == blocks[i+3] and blocks[i]!=blocks[i+2]:
+            return i
+        return None
+
     # determine length of secret and associated
     # buffer string
     padded_length = len(res)
     buf = b""
+    # need to do signature detection here as well
+    # so that we can accurately detect the message length.
     while padded_length == len(oracle.encrypt(buf)):
         buf += b"a"
     buf = buf[:-1]
     secret_length = padded_length - len(buf)
     known_secret = b""
     for i in range(secret_length):
+        signature = b"A"*32+b"B"*32
         pull_buf = (len(buf) + secret_length - (i+1))*b"a"
         # Layout is
+        # - Prefix, which we assume is 16 byte aligned. It will
+        #   be 1/16th of the time
         # - Bunch of A's with guess
         # - Bunch of A's with pulled value
         # - Suffix
         # Always compare the last block of the first bunch of a's
         # with the last block of the second bunch of as
+
+
+        # So we optimistically guess that we're aligned.
+        # and we just need to find the start of the ECB.
         for guess_char in range(256):
             guess_char = bytes([guess_char])
             first_blocks = pull_buf + known_secret + guess_char
             # layout
             index = len(first_blocks)//16 - 1
             index2 = 2*len(first_blocks)//16 - 1
-            test = first_blocks + pull_buf
-            result = oracle.encrypt(test)
-            result_blocks = list(gen_blocks(result))
+            test = signature + first_blocks + pull_buf
+            start_index = None
+            # Keep trying unitl we get a result with
+            # aligned random bytes
+            while start_index == None:
+                result = oracle.encrypt(test)
+                result_blocks = list(gen_blocks(result))
+                start_index = find_signature(result_blocks)
+            index += start_index + 4
+            index2 += start_index + 4
             if result_blocks[index] == result_blocks[index2]:
                 known_secret += guess_char
                 break
-    assert known_secret == secret#
+
+    assert known_secret == pad_pkcs7(secret,16)#
