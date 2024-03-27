@@ -80,6 +80,8 @@ class SuffixECBEncryptionOracleWithRandomPrefix(SuffixECBEncryptionOracle):
     def __init__(self, suffix):
         SuffixECBEncryptionOracle.__init__(self, suffix)
     def encrypt(self, data):
+        # This is incorrect for challenge 14.
+        # they want this to be part of the constructor.
         noise = os.urandom(random.randint(1,256))
         return aes_decrypt_ecb(pad(noise + data + self.suffix, 16), self.key)
 

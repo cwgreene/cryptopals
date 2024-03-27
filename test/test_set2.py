@@ -96,7 +96,9 @@ def test_chal14():
     oracle = SuffixECBEncryptionOracleWithRandomPrefix(secret)
 
     # The following signature will be two repeated blocks
-    # followed by another two *dif
+    # followed by another two *different* ones.
+    # Actually, we can probably just grab all the AAABBB
+    # combos and look for those.
     signature = b"A"*32+b"B"*32
     def find_signature(blocks):
         i = 0
