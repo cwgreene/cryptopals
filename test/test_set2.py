@@ -94,8 +94,10 @@ def test_chal12():
 def test_chal14():
     secret = base64.b64decode(open(cryptolib.datafile("12.txt")).read())
     oracle = SuffixECBEncryptionOracleWithRandomPrefix(secret)
-    res = oracle.encrypt(b"")
 
+    # The following signature will be two repeated blocks
+    # followed by another two *dif
+    signature = b"A"*32+b"B"*32
     def find_signature(blocks):
         i = 0
         while blocks[i] != blocks[i+1]:
@@ -109,6 +111,7 @@ def test_chal14():
 
     # determine length of secret and associated
     # buffer string
+    res = oracle.encrypt(b"")
     padded_length = len(res)
     buf = b""
     # need to do signature detection here as well
@@ -119,7 +122,6 @@ def test_chal14():
     secret_length = padded_length - len(buf)
     known_secret = b""
     for i in range(secret_length):
-        signature = b"A"*32+b"B"*32
         pull_buf = (len(buf) + secret_length - (i+1))*b"a"
         # Layout is
         # - Prefix, which we assume is 16 byte aligned. It will
@@ -147,7 +149,7 @@ def test_chal14():
                 result = oracle.encrypt(test)
                 result_blocks = list(gen_blocks(result))
                 start_index = find_signature(result_blocks)
-            index += start_index + 4
+            index += start_index + 4 # remember to add back in the signature offset
             index2 += start_index + 4
             if result_blocks[index] == result_blocks[index2]:
                 known_secret += guess_char
