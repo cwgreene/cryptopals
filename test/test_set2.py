@@ -111,16 +111,24 @@ def test_chal14():
 
     # determine length of secret and associated
     # buffer string
-    res = oracle.encrypt(b"")
-    padded_length = len(res)
-    buf = b""
+    buf = signature
     # need to do signature detection here as well
     # so that we can accurately detect the message length.
-    while padded_length == len(oracle.encrypt(buf)):
-        buf += b"a"
+    padded_length = None
+    while True:
+        res = oracle.encrypt(buf)
+        blocks = list(gen_blocks(res))
+        if (i:=find_signature(blocks)):
+            if padded_length == None:
+                padded_length = len(res[i*16:])
+            elif padded_length == len(res[i*16:]):
+                buf += b"a"
+            else:
+                break
     buf = buf[:-1]
     secret_length = padded_length - len(buf)
     known_secret = b""
+    assert secret_length == len(secret)
     for i in range(secret_length):
         pull_buf = (len(buf) + secret_length - (i+1))*b"a"
         # Layout is
@@ -155,4 +163,4 @@ def test_chal14():
                 known_secret += guess_char
                 break
 
-    assert known_secret == pad_pkcs7(secret,16)#
+    assert known_secret == secret
