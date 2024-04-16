@@ -79,11 +79,11 @@ class SuffixECBEncryptionOracle(EncryptionOracle):
 class SuffixECBEncryptionOracleWithRandomPrefix(SuffixECBEncryptionOracle):
     def __init__(self, suffix):
         SuffixECBEncryptionOracle.__init__(self, suffix)
+        self.noise = os.urandom(random.randint(1,256))
     def encrypt(self, data):
         # This is incorrect for challenge 14.
         # they want this to be part of the constructor.
-        noise = os.urandom(random.randint(1,256))
-        return aes_decrypt_ecb(pad(noise + data + self.suffix, 16), self.key)
+        return aes_decrypt_ecb(pad(self.noise + data + self.suffix, 16), self.key)
 
 def oracle_detect_ecb(oracle : EncryptionOracle):
     result = oracle.encrypt(b"A"*32+b"A"*11)
